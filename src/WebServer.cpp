@@ -11,7 +11,6 @@ void WebServer::registerHandlers() {
     server->on("/settings", std::bind(&WebServer::handle_settings, this));
     server->on("/on", std::bind(&WebServer::handle_on, this));
     server->on("/off", std::bind(&WebServer::handle_off, this));
-    server->on("/q", std::bind(&WebServer::handle_q, this));
 }
 
 void WebServer::handle_root() {
@@ -52,11 +51,5 @@ void WebServer::handle_on() {
 void WebServer::handle_off() {
     digitalWrite(PIN_PWM_OUTPUT, HIGH);
     digitalWrite(PIN_FAN_OUTPUT, LOW);
-    server->send(200);
-}
-
-void WebServer::handle_q() {
-    influxClient.query();
-    logger->log("Humidity: %f", influxClient.getQueryResult());
     server->send(200);
 }

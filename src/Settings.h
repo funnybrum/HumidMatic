@@ -7,6 +7,9 @@
 struct SettingsData {
     NetworkSettings network;
     InfluxDBClientSettings ifxSettings;
+    struct HumidMatic {
+        uint8_t targetHumidity;
+    } hm;
 };
 
 class Settings: public SettingsBase<SettingsData> {

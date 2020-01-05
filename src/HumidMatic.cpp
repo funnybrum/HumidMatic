@@ -45,6 +45,11 @@ void loop() {
     wifi.loop();
     webServer.loop();
     settings.loop();
+    influxClient.loop();
+
+    if (influxClient.isDataAvailable()) {
+        
+    }
 
     delay(100);
 }
