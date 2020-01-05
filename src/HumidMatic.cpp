@@ -4,7 +4,6 @@ Logger logger = Logger();
 Settings settings = Settings();
 
 WiFiManager wifi = WiFiManager(&logger, &settings.getSettings()->network);
-SystemCheck systemCheck = SystemCheck(&logger);
 WebServer webServer = WebServer(&logger, &settings.getSettings()->network);
 
 void setup()
@@ -16,16 +15,26 @@ void setup()
     settings.begin();
     wifi.begin();
     webServer.begin();
-    systemCheck.begin();
+
+    pinMode(PIN_FAN_OUTPUT, OUTPUT);
+    digitalWrite(PIN_FAN_OUTPUT, LOW);
+
+    pinMode(PIN_PWM_OUTPUT, OUTPUT);
+    digitalWrite(PIN_PWM_OUTPUT, HIGH);
+
+    pinMode(PIN_WATER_LEVEL, INPUT);
 
     wifi.connect();
+}
+
+bool isWaterOK() {
+    return digitalRead(PIN_WATER_LEVEL) == HIGH;
 }
 
 void loop() {
     wifi.loop();
     webServer.loop();
     settings.loop();
-    systemCheck.loop();
 
     delay(100);
 }

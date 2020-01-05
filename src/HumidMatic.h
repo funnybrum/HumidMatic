@@ -12,7 +12,10 @@
 #define HTTP_PORT 80
 #define HOSTNAME "humid-matic"
 
+#define PIN_WATER_LEVEL 13
+#define PIN_PWM_OUTPUT 4
+#define PIN_FAN_OUTPUT 12
+
 extern Logger logger;
 extern Settings settings;
 extern WiFiManager wifi;
-extern SystemCheck systemCheck;
