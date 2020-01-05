@@ -2,9 +2,11 @@
 
 #include "SettingsBase.h"
 #include "WiFi.h"
+#include "InfluxDBClient.h"
 
 struct SettingsData {
     NetworkSettings network;
+    InfluxDBClientSettings ifxSettings;
 };
 
 class Settings: public SettingsBase<SettingsData> {

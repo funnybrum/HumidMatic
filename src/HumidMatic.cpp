@@ -5,6 +5,11 @@ Settings settings = Settings();
 
 WiFiManager wifi = WiFiManager(&logger, &settings.getSettings()->network);
 WebServer webServer = WebServer(&logger, &settings.getSettings()->network);
+InfluxDBClient influxClient = InfluxDBClient(&logger,
+                                             &wifi,
+                                             &settings.getSettings()->ifxSettings,
+                                             &settings.getSettings()->network);
+
 
 void setup()
 { 
@@ -12,9 +17,6 @@ void setup()
     while (! Serial) {
         delay(1);
     }
-    settings.begin();
-    wifi.begin();
-    webServer.begin();
 
     pinMode(PIN_FAN_OUTPUT, OUTPUT);
     digitalWrite(PIN_FAN_OUTPUT, LOW);
@@ -23,6 +25,14 @@ void setup()
     digitalWrite(PIN_PWM_OUTPUT, HIGH);
 
     pinMode(PIN_WATER_LEVEL, INPUT);
+
+    // Fan on.
+    pinMode(PIN_FAN_OUTPUT, HIGH);
+
+    settings.begin();
+    wifi.begin();
+    webServer.begin();
+    influxClient.begin();
 
     wifi.connect();
 }
