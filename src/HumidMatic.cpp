@@ -9,7 +9,7 @@ InfluxDBClient influxClient = InfluxDBClient(&logger,
                                              &wifi,
                                              &settings.getSettings()->ifxSettings,
                                              &settings.getSettings()->network);
-
+Humidifier humidifier = Humidifier(PIN_FAN_OUTPUT, PIN_PWM_OUTPUT, PIN_WATER_LEVEL);
 
 void setup()
 { 
@@ -18,17 +18,7 @@ void setup()
         delay(1);
     }
 
-    pinMode(PIN_FAN_OUTPUT, OUTPUT);
-    digitalWrite(PIN_FAN_OUTPUT, LOW);
-
-    pinMode(PIN_PWM_OUTPUT, OUTPUT);
-    digitalWrite(PIN_PWM_OUTPUT, HIGH);
-
-    pinMode(PIN_WATER_LEVEL, INPUT);
-
-    // Fan on.
-    pinMode(PIN_FAN_OUTPUT, HIGH);
-
+    humidifier.begin();
     settings.begin();
     wifi.begin();
     webServer.begin();
@@ -37,19 +27,12 @@ void setup()
     wifi.connect();
 }
 
-bool isWaterOK() {
-    return digitalRead(PIN_WATER_LEVEL) == HIGH;
-}
-
 void loop() {
     wifi.loop();
     webServer.loop();
     settings.loop();
     influxClient.loop();
-
-    if (influxClient.isDataAvailable()) {
-        
-    }
+    humidifier.loop();
 
     delay(100);
 }

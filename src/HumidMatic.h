@@ -10,6 +10,8 @@
 #include "esp8266-base.h"
 #include "InfluxDBClient.h"
 
+#include "Humidifier.h"
+
 #define HTTP_PORT 80
 #define HOSTNAME "humid-matic"
 

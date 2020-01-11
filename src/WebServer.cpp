@@ -9,8 +9,6 @@ WebServer::WebServer(Logger* logger, NetworkSettings* networkSettings)
 void WebServer::registerHandlers() {
     server->on("/", std::bind(&WebServer::handle_root, this));
     server->on("/settings", std::bind(&WebServer::handle_settings, this));
-    server->on("/on", std::bind(&WebServer::handle_on, this));
-    server->on("/off", std::bind(&WebServer::handle_off, this));
 }
 
 void WebServer::handle_root() {
@@ -23,6 +21,8 @@ void WebServer::handle_settings() {
 
     wifi.parse_config_params(this, save);
     influxClient.parse_config_params(this, save);
+    process_setting("humidity", settings.getSettings()->hm.targetHumidity, save);
+
 
     if (save) {
         settings.save();
@@ -38,18 +38,7 @@ void WebServer::handle_settings() {
         buffer,
         CONFIG_PAGE,
         network_settings,
-        influx_settings);
+        influx_settings,
+        settings.getSettings()->hm.targetHumidity);
     server->send(200, "text/html", buffer);
-}
-
-void WebServer::handle_on() {
-    digitalWrite(PIN_PWM_OUTPUT, LOW);
-    digitalWrite(PIN_FAN_OUTPUT, HIGH);
-    server->send(200);
-}
-
-void WebServer::handle_off() {
-    digitalWrite(PIN_PWM_OUTPUT, HIGH);
-    digitalWrite(PIN_FAN_OUTPUT, LOW);
-    server->send(200);
 }

@@ -10,6 +10,4 @@ class WebServer: public WebServerBase {
         void registerHandlers();
         void handle_root();
         void handle_settings();
-        void handle_on();
-        void handle_off();
 };

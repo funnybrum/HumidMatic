@@ -7,6 +7,12 @@ const char CONFIG_PAGE[] PROGMEM = R"=====(
   <form action="/settings" method="get">
    %s<br><br>
    %s<br><br>
+   <fieldset style='display: inline-block; width: 300px'>
+    <legend>Humidity settings</legend>
+    Target relative humidity:<br>
+    <input type="text" name="humidity" value="%d"><br>
+    <small><em>in %%, from 0 to 100</em></small><br><br>
+   </fieldset>
    <br><br>
    <input type="submit" value="Save" style='width: 150px;'>
    &nbsp;&nbsp;&nbsp;
