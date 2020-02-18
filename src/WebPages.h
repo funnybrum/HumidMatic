@@ -9,8 +9,11 @@ const char CONFIG_PAGE[] PROGMEM = R"=====(
    %s<br><br>
    <fieldset style='display: inline-block; width: 300px'>
     <legend>Humidity settings</legend>
-    Target relative humidity:<br>
-    <input type="text" name="humidity" value="%d"><br>
+    Relative humidity lower threshold:<br>
+    <input type="text" name="humidity_low" value="%d"><br>
+    <small><em>in %%, from 0 to 100</em></small><br><br>
+    Relative humidity upper threshold:<br>
+    <input type="text" name="humidity_high" value="%d"><br>
     <small><em>in %%, from 0 to 100</em></small><br><br>
    </fieldset>
    <br><br>

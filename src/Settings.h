@@ -8,7 +8,8 @@ struct SettingsData {
     NetworkSettings network;
     InfluxDBClientSettings ifxSettings;
     struct HumidMatic {
-        uint8_t targetHumidity;
+        uint8_t targetHumidityLow;
+        uint8_t targetHumidityHigh;
     } hm;
 };
 

@@ -21,7 +21,8 @@ void WebServer::handle_settings() {
 
     wifi.parse_config_params(this, save);
     influxClient.parse_config_params(this, save);
-    process_setting("humidity", settings.getSettings()->hm.targetHumidity, save);
+    process_setting("humidity_low", settings.getSettings()->hm.targetHumidityLow, save);
+    process_setting("humidity_high", settings.getSettings()->hm.targetHumidityHigh, save);
 
 
     if (save) {
@@ -39,6 +40,7 @@ void WebServer::handle_settings() {
         CONFIG_PAGE,
         network_settings,
         influx_settings,
-        settings.getSettings()->hm.targetHumidity);
+        settings.getSettings()->hm.targetHumidityLow,
+        settings.getSettings()->hm.targetHumidityHigh);
     server->send(200, "text/html", buffer);
 }
