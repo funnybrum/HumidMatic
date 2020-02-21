@@ -48,7 +48,7 @@ void Humidifier::loop() {
         digitalWrite(_fanPin, HIGH);
         digitalWrite(_pwmPin, LOW);
         logger.log("Last humidity is %.1f, turning on.", humidity);
-        _calcNextCycleDuration(humidity, settings.getSettings()->hm.targetHumidityLow);
+        _calcNextCycleDuration(humidity, settings.getSettings()->hm.targetHumidityHigh);
         _onTimestamp = millis();
     }
     
@@ -76,10 +76,26 @@ void Humidifier::_calcNextCycleDuration(float currentHumidity, float targetHumid
         return;
     }
 
+    unsigned long now = millis();
+
     wifi.connect();
+    int counter = 100;
+    while (!wifi.isConnected() && counter > 0) {
+        delay(100);
+        counter--;
+    }
+
+    if (counter == 0) {
+        logger.log("Failed to connect.");
+        return;
+    }
+
+    logger.log("On timestamp is now - %dm", (now - _onTimestamp) / 60000);
+    logger.log("Off timestamp is now - %dm", (now - _offTimestamp) / 60000);
+
 
     // 1) Find out the humidity at the start of the previous cycle.
-    bool result = influxClient.query((millis() - _onTimestamp) / 60000);
+    bool result = influxClient.query((now - _onTimestamp) / 60000);
     if (!result) {
         logger.log("Failed to get previous start cycle humidity.");
         wifi.disconnect();
@@ -89,7 +105,7 @@ void Humidifier::_calcNextCycleDuration(float currentHumidity, float targetHumid
     influxClient.purgeData();
 
     // 2) Find out the humidity at the end of the previous cycle.
-    result = influxClient.query((millis() - _offTimestamp) / 60000);
+    result = influxClient.query((now - _offTimestamp) / 60000);
     if (!result) {
         logger.log("Failed to get previous end cycle humidity.");
         wifi.disconnect();
@@ -100,14 +116,29 @@ void Humidifier::_calcNextCycleDuration(float currentHumidity, float targetHumid
 
     // 3) Based on the previous cycle duration and the humidity raise in it - calculate the
     // required cycle length to reach the upper humidity threshold.
+
+
     float lastHumidityRaise = endCycleHumidity - startCycleHumidity;
     unsigned long lastCycleDuration = _offTimestamp - _onTimestamp;
     float targetHumidityRaise = targetHumidity - currentHumidity;
-    _cycleDuration = (targetHumidityRaise/lastHumidityRaise) * lastCycleDuration;
 
     wifi.disconnect();
+
     logger.log("Prev start/end humidity was %.1f / %.1f", startCycleHumidity, endCycleHumidity);
     logger.log("Last cycle duration was %d seconds", lastCycleDuration/1000);
     logger.log("Current humidity is %.1f, target humidity raise is %.1f", currentHumidity, targetHumidityRaise);
+
+    if (startCycleHumidity > settings.getSettings()->hm.targetHumidityLow) {
+        logger.log("Unexpected prev start cycle humidity");
+        return;
+    }
+
+
+    if (endCycleHumidity < settings.getSettings()->hm.targetHumidityHigh) {
+        logger.log("Unexpected prev end cycle humidity");
+        return;
+    }
+
+    _cycleDuration = (targetHumidityRaise/lastHumidityRaise) * lastCycleDuration;
     logger.log("Next cycle duration is %d seconds", _cycleDuration / 1000);
 }
