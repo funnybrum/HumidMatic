@@ -49,23 +49,27 @@ void Humidifier::loop() {
         digitalWrite(_pwmPin, LOW);
         logger.log("Last humidity is %.1f, turning on.", humidity);
         _calcNextCycleDuration(humidity, settings.getSettings()->hm.targetHumidityHigh);
-        _onTimestamp = millis();
+        // This can be invoked multiple times iff humidity is raising slow and on the next check cycle it is still
+        // below the targetHumidityLow threshold.
+        if (_onTimestamp = 0) {
+            _onTimestamp = millis();
+            _offTimestsamp = 0;
+        }
     }
-    
-    if (humidityHigh) {
+
+    if (humidityHigh || humidificationCycleCompleted) {
         digitalWrite(_fanPin, LOW);
         digitalWrite(_pwmPin, HIGH);
-        logger.log("Last humidity is %.1f, turning off", humidity);
+
+        if (humidityHigh) logger.log("Last humidity is %.1f, turning off", humidity);
+        if (humidificationCycleCompelted) logger.log("Humidification cycle completed, turning off");
+
         _cycleDuration = 0;
-        _offTimestamp = millis();
-    }
-    
-    if (humidificationCycleCompleted) {
-        digitalWrite(_fanPin, LOW);
-        digitalWrite(_pwmPin, HIGH);
-        logger.log("Humidification cycle completed, turning off");
-        _cycleDuration = 0;
-        _offTimestamp = millis();
+        // This can be invoked multiple times iff humidity is falling slow and on the next check cycle it is while
+        // the humidity is still above the targetHumidityHigh threshold.
+        if (_offTimestamp = 0) {
+            _offTimestamp = millis();
+        }
     }
 }
 
