@@ -8,7 +8,11 @@ class Humidifier {
         void begin();
         void loop();
     private:
-        void _calcNextCycleDuration(float currentHumidity, float targetHumidity);
+        void calcNextCycleDuration(float currentHumidity, float targetHumidity);
+        void start();
+        void stop(boolean force=false);
+        boolean waterOK();
+        void cleanUp();
         
         uint8_t _fanPin;
         uint8_t _pwmPin;
@@ -23,4 +27,8 @@ class Humidifier {
         // not in effect because this is the first humidification cycle. If > 0 the humidification
         // will be stopped when the _onTimestamp + _cycleDuration millis are reached.
         unsigned long _cycleDuration;
+
+        // State
+        boolean isRunning;
+        boolean isWaterOK;
 };

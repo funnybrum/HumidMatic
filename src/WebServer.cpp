@@ -9,6 +9,8 @@ WebServer::WebServer(Logger* logger, NetworkSettings* networkSettings)
 void WebServer::registerHandlers() {
     server->on("/", std::bind(&WebServer::handle_root, this));
     server->on("/settings", std::bind(&WebServer::handle_settings, this));
+    server->on("/on", std::bind(&WebServer::handle_on, this));
+    server->on("/off", std::bind(&WebServer::handle_off, this));
 }
 
 void WebServer::handle_root() {
@@ -43,4 +45,18 @@ void WebServer::handle_settings() {
         settings.getSettings()->hm.targetHumidityLow,
         settings.getSettings()->hm.targetHumidityHigh);
     server->send(200, "text/html", buffer);
+}
+
+void WebServer::handle_on() {
+    digitalWrite(PIN_FAN_OUTPUT, HIGH);
+    digitalWrite(PIN_PWM_OUTPUT, LOW);
+
+    server->send(200, "text/html", "on");
+}
+
+void WebServer::handle_off() {
+    digitalWrite(PIN_FAN_OUTPUT, LOW);
+    digitalWrite(PIN_PWM_OUTPUT, HIGH);
+
+    server->send(200, "text/html", "off");
 }
